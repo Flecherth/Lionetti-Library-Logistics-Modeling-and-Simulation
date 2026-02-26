@@ -1,20 +1,31 @@
 import java.util.*;
 public class Shelf {
     //Identifies the shelf
-    private String id;
-    //
+    private int id;
+    //Alphabetical range for the shelves
     private String range;
-
-    //An array of books for the shelf to hold
+    //Shelfs can hold 60 books
+    static int shelfSize = 60;
+    //An array of books for the shelf to hold (Should it be a list?)
     Book[] Books = new Book[60];
 
-    //Shelf constructor
-    Shelf(){
-
+    //FIFO Shelf Constructor (doesn't utilize range as shelves aren't sorted alphabetically)
+    Shelf(int id){
+        this.id = id;
+        Book[] Books = new Book[60];
     }
 
+    //Normal Shelf constructor (utilizes range to shelve alphabetically)
+    Shelf(int id, String range){
+        this.id = id;
+        this.range = range;
+        Book[] Books = new Book[60];
+    }
+
+
+
     //Method to insert a book into the shelf
-    static void insertBook(int b){
+    static void insertBook(Book b){
 
     }
 
@@ -24,7 +35,7 @@ public class Shelf {
     }
 
     //Function that gets distance to the shelf from current position
-    int getDistanceTo(){
+    int getDistanceTo(Shelf s){
         int distance;
         return distance;
     }
