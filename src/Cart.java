@@ -1,9 +1,10 @@
 public class Cart {
 
+    static Book[] books;
     Cart(){
         //Carts will have an array of no more than 50 books
         Book[] books = new Book[50];
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < 40; i++){
             books[i] = (new Book());
         }
     }
@@ -19,9 +20,10 @@ public class Cart {
         }
     }
 
-    //Not certain what the parameter should be, but this method returns and removes a book from the cart
-    static Book removeBook(){
-        return books[j];
+    //This method returns and removes a book from the cart
+    static Book removeBook(int j){
+        Book removedBook = books[j];
+        books[j] = null;
+        return removedBook;
     }
-
 }

@@ -1,7 +1,7 @@
 import java.util.*;
-public class LibrarySort implements Algorithm{
+public class LibrarySort implements SortingAlgorithm{
     @Override
-    public List<Book> generateShelvingSequence(Cart cart) {
+    public List<Book> sortingSequence(Cart cart) {
         return null;
     }
 }
