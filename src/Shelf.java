@@ -6,15 +6,16 @@ public class Shelf {
     private int startingRange;
     //Alphabetical end of the range for the shelves as an integer (0=A and Z=25)
     private int endRange;
-    //Shelfs can hold 60 books
-    static int shelfSize = 60;
+    //Shelves can hold 300 books
+    static int shelfSize = 300;
     //An array of books for the shelf to hold (Should it be a list?)
-    static Book[] Books = new Book[60];
+    public Book[] Books = new Book[300];
 
     //FIFO Shelf Constructor (doesn't utilize range as shelves aren't sorted alphabetically)
     Shelf(int id){
         this.id = id;
-        Book[] Books = new Book[60];
+        Book[] Books = new Book[300];
+        this.shelfSize = Books.length;
     }
 
     //Normal Shelf constructor (utilizes range to shelve alphabetically)
@@ -22,23 +23,36 @@ public class Shelf {
         this.id = id;
         this.startingRange = startingRange;
         this.endRange = endRange;
-        Book[] Books = new Book[60];
+        Book[] Books = new Book[300];
+        this.shelfSize = Books.length;
     }
 
 
-
+    //Might want to change method of sorting to Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle
     //Method to insert a book into the shelf
-    static void insertBook(Book b){
-        for (int i = 0; i<Books.length; i++){
-            //Needs a handler for overflow as well as moving the books to the right of the insertion
-            if (Books[i-1].getAuthor().compareTo(b.getAuthor()) < 0 && (b.getAuthor().compareTo(Books[i].getAuthor()) > 0)){
-                Books[i] = b;
+    public void insertBook(Book b){
+        for (int i = 0; i<Books.length-1; i++){
+            //Needs a handler for overflow and title as well as moving the books to the right of the insertion
+            if (Books[i].getAuthor().compareTo(b.getAuthor()) < 0 && (b.getAuthor().compareTo(Books[i+1].getAuthor()) > 0)){
+                //Book that is currently being held to put on the shelf (physically speaking)
+                Book heldBook = b;
+                //Next book on the shelf which needs to be stored to prevent it from being overwritten
+                Book nextBook;
+                for(int j = i; j < Books.length; j++){
+                    //Only shifts book to the right when there is a book to move
+                    if(Books[j] != null){
+                        nextBook = Books[j];
+                        Books[j] = heldBook;
+                        heldBook = nextBook;
+                    }
+                }
+                return;
             }
         }
     }
 
     //Method to remove and return a book from the shelf given an index
-    static Book removeBook(int b){
+    public Book removeBook(int b){
         Book removedBook = Books[b];
         Books[b] = null;
         return removedBook;
@@ -51,7 +65,7 @@ public class Shelf {
     }
 
     //New method to determine if the shelf has an empty space for insertion
-    static boolean isNotFull(){
+    public boolean isNotFull(){
         for (Book book : Books) {
             if (book == null) {
                 return true;
@@ -75,12 +89,12 @@ public class Shelf {
     //Calculates shelf usage of a single shelf
     int calculateShelfUsage(Shelf s){
         int filledSlots = 0;
-        for (int i = 0; i<60; i++){
+        for (int i = 0; i<Books.length; i++){
             if(s.Books[i] != null){
                 filledSlots++;
             }
         }
-        return ((filledSlots * 100) / 60);
+        return ((filledSlots * 100) / 300);
     }
 
     public void setStartingRange(int startingRange) {
@@ -95,4 +109,7 @@ public class Shelf {
         return endRange;
     }
 
+    public int getID() {
+        return id;
+    }
 }

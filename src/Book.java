@@ -13,11 +13,11 @@ public class Book {
     this.author = "" + alphabet.charAt(r.nextInt(26)) + alphabet.charAt(r.nextInt(26)) + alphabet.charAt(r.nextInt(26));
     }
 
-    String getTitle(){
+    public String getTitle(){
         return title;
     }
 
-    String getAuthor(){
+    public String getAuthor(){
         return author;
     }
 
@@ -28,10 +28,10 @@ public class Book {
         return books[i - 1].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 1].getAuthor()) <= 0);
     }
 
-    //Setting destination to a new shelf by returning an integer to go to the id of the new shelf when given author and title
-    int setDestination(String s){
-        char firstChar = Character.toUpperCase(getAuthor().charAt(0));
-        //Getting the index by subtracting the ascii value of the first letter of the author name by the ascii value of A
-        return firstChar - 'A';
+    //Setting destination to a new shelf by returning an integer to go to the id based on the first letter of the author's last name
+    public static int setDestination(Book currentBook, int numOfShelves){
+        char firstChar = Character.toUpperCase(currentBook.getAuthor().charAt(0));
+        //Getting the index by subtracting the ascii value of the first letter of the author name by the ascii value of A dividing it by # of shelves and then 26
+        return ((firstChar - 'A') * (numOfShelves) /26);
     }
 }
