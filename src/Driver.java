@@ -4,6 +4,7 @@ import java.util.Scanner;
 public class Driver {
     public static void main(String[] args) {
         boolean cartsInitialized = false;
+        boolean FIFOShelving = false;
         Library myLibrary = new Library();
         ShelvingAlgorithm FIFS = new FIFS();
         ShelvingAlgorithm BinaryInsertionSort = new BinaryInsertionSort();
@@ -64,7 +65,7 @@ public class Driver {
                     for (Cart cart : myLibrary.carts) {
                         FIFS.generateShelvingSequence(cart, myLibrary.FIFOShelves, myLibrary);
                     }
-                    myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.FIFOShelves));
+                    FIFOShelving = true;
                     break;
                 //Shelves the sorted cart using Sequential Shelving when option 5 is selected
                 case 5:
@@ -83,7 +84,11 @@ public class Driver {
                     break;
                 //Calculates shelf usage and records it when option 8 is selected
                 case 8:
-                    myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.sortedShelves));
+                    if (FIFOShelving){
+                        myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.FIFOShelves));
+                    } else {
+                        myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.sortedShelves));
+                    }
                     break;
                 //Prints the results of this run when option 9 is selected
                 case 9:
