@@ -23,9 +23,21 @@ public class Book {
 
 
     //Checks prior and next book on the shelf to see if the book is misplaced
-    boolean isMisplaced(Book[] books, int i){
-        //Note: Needs a handler for overflow and underflow
-        return books[i - 1].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 1].getAuthor()) <= 0);
+    boolean isMisplaced(Book[] books, int i, boolean route){
+        if (route) {
+            if(i != 0 && i < books.length-1){
+                if (books[i-1] != null && books[i] != null && books[i+1] != null) {
+                    return books[i - 1].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 1].getAuthor()) >= 0);
+                }
+            }
+        } else {
+            if((i > 1) && i < books.length - 2) {
+                if (books[i-1] != null && books[i] != null && books[i+1] != null) {
+                    return books[i - 2].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 2].getAuthor()) <= 0);
+                }
+            }
+        }
+        return false;
     }
 
     //Setting destination to a new shelf by returning an integer to go to the id based on the first letter of the author's last name

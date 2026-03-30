@@ -6,25 +6,25 @@ public class Shelf {
     private int startingRange;
     //Alphabetical end of the range for the shelves as an integer (0=A and Z=25)
     private int endRange;
-    //Shelves can hold 300 books
-    static int shelfSize = 300;
+    //Shelves can hold this many books
+    public int shelfSize;
     //An array of books for the shelf to hold (Should it be a list?)
-    public Book[] Books = new Book[300];
+    public Book[] Books;
 
     //FIFO Shelf Constructor (doesn't utilize range as shelves aren't sorted alphabetically)
-    Shelf(int id){
+    Shelf(int id, int inputtedShelfSize){
         this.id = id;
-        Book[] Books = new Book[300];
-        this.shelfSize = Books.length;
+        this.shelfSize = inputtedShelfSize;
+        this.Books = new Book[shelfSize];
     }
 
     //Normal Shelf constructor (utilizes range to shelve alphabetically)
-    Shelf(int id, int startingRange, int endRange){
+    Shelf(int id, int startingRange, int endRange, int inputtedShelfSize){
         this.id = id;
         this.startingRange = startingRange;
         this.endRange = endRange;
-        Book[] Books = new Book[300];
-        this.shelfSize = Books.length;
+        this.shelfSize = inputtedShelfSize;
+        this.Books = new Book[shelfSize];
     }
 
 
@@ -33,6 +33,10 @@ public class Shelf {
     public void insertBook(Book b){
         for (int i = 0; i<Books.length-1; i++){
             //Needs a handler for overflow and title as well as moving the books to the right of the insertion
+            if (Books[i+1] == null){
+                Books[i+1] = b;
+                return;
+            }
             if (Books[i].getAuthor().compareTo(b.getAuthor()) < 0 && (b.getAuthor().compareTo(Books[i+1].getAuthor()) > 0)){
                 //Book that is currently being held to put on the shelf (physically speaking)
                 Book heldBook = b;
@@ -94,7 +98,7 @@ public class Shelf {
                 filledSlots++;
             }
         }
-        return ((filledSlots * 100) / 300);
+        return ((filledSlots * 100) / shelfSize);
     }
 
     public void setStartingRange(int startingRange) {

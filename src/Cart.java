@@ -11,6 +11,14 @@ public class Cart {
         }
     }
 
+    Cart(int cartSize){
+        //Carts will have an array of no more than 50 books
+        books = new Book[cartSize];
+        for(int i = 0; i < cartSize; i++){
+            books[i] = new Book();
+        }
+    }
+
     //Adds the book to the cart in the first available position
     public void addBook(Book b){
         for (int i = 0; i < books.length; i++){

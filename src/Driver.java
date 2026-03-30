@@ -1,106 +1,154 @@
-import java.util.Comparator;
-import java.util.Scanner;
+import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.List;
+
+
 
 public class Driver {
     public static void main(String[] args) {
-        boolean cartsInitialized = false;
-        boolean FIFOShelving = false;
-        Library myLibrary = new Library();
-        ShelvingAlgorithm FIFS = new FIFS();
-        ShelvingAlgorithm BinaryInsertionSort = new BinaryInsertionSort();
-        ShelvingAlgorithm SequentialShelving = new SequentialShelving();
         //Introducing a scanner object so that user inputs can be read later
         Scanner scan = new Scanner(System.in);
-        int choice;
-        //Menu Loop that runs until the user chooses option 10
-        while (true) {
-            //Menu Text
-            System.out.print("\n\n---------MAIN MENU---------\n1 - Generate Cart \n2 - Sort Cart Using Merge Sort\n3 - Sort Cart Using Insertion Sort\n4 - Start Shelving Using FIFO\n5 - Shelve the Cart using Sequential Shelving\n6 - Shelve the Cart Using ACO\n7 - Find Misplaced Books\n8 - Calculate Shelf Usage\n9 - Print Results\n10 - Exit program\n\nEnter option number:");
-            //Reading user's choice
-            choice = scan.nextInt();
-            scan.nextLine();
-            //Menu options
-            switch (choice) {
-                //Generates the array of carts of books when option 1 is selected
-                case 1:
-                    if (myLibrary.numOfCarts < myLibrary.carts.length){
-                        for (int i = 0; i< myLibrary.carts.length; i++){
-                            myLibrary.carts[i] = new Cart();
-                            myLibrary.numOfCarts++;
-
-                        }
-                    } else {
-                        System.out.println("\nToo many carts.");
-                    }
-                    break;
-                //Sorts carts using Merge Sort when option 2 is selected (Chose to change from Library Sort to Merge Sort for sorting carts as it is more accurate to the method I shelve in real life
-                case 2:
-
-                    break;
-                //Sorts a cart using regular insertion sort when option 3 is selected
-                case 3:
-                    if (!cartsInitialized){
-                        System.out.println("Please initialize carts first and try again");
-                        break;
-                    }
-                    for (Cart cart : myLibrary.carts){
-                        for (int i = 1; i < cart.books.length; i++){
-                            Book key = cart.books[i];
-                            //Prevents NullPointerExceptions
-                            if (key == null){
-                                continue;
-                            }
-                            int comparedIndex = i - 1;
-                            while (comparedIndex >= 0 && Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle).compare(key, cart.books[comparedIndex]) > 0){
-                                cart.books[comparedIndex + 1] = cart.books[comparedIndex];
-                                comparedIndex--;
-                            }
-                            cart.books[comparedIndex + 1] = key;
-                        }
-                        System.out.println("\nSuccessful Loop");
-                    }
-                    break;
-                //Shelve using the cart generated with option 1 using the FIFO method when option 4 is selected
-                case 4:
-                    for (Cart cart : myLibrary.carts) {
-                        FIFS.generateShelvingSequence(cart, myLibrary.FIFOShelves, myLibrary);
-                    }
-                    FIFOShelving = true;
-                    break;
-                //Shelves the sorted cart using Sequential Shelving when option 5 is selected
-                case 5:
-                    for (Cart cart : myLibrary.carts) {
-                        BinaryInsertionSort.generateShelvingSequence(cart, myLibrary.sortedShelves, myLibrary);
-                    }
-                    break;
-                //Shelves the sorted cart using ACO when option 6 is selected (not yet implemented)
-                case 6:
-                    //ACO.generateShelvingSequence();
-                    break;
-                //Finds misplaced books, counts them, and adds them to a cart when option 7 is selected
-                case 7:
-                    //Function needs an overhaul
-                    //findMisplacedBooks()
-                    break;
-                //Calculates shelf usage and records it when option 8 is selected
-                case 8:
-                    if (FIFOShelving){
-                        myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.FIFOShelves));
-                    } else {
-                        myLibrary.LibraryMetrics.setShelfUsage(myLibrary.getOverallUtilizationPercentage(myLibrary.sortedShelves));
-                    }
-                    break;
-                //Prints the results of this run when option 9 is selected
-                case 9:
-                    myLibrary.LibraryMetrics.printResults(myLibrary);
-                    break;
-                //Shuts the program down when option 10 is selected
-                case 10:
-                    scan.close();
-                    System.out.println("\nShutting down...");
-                    System.exit(0);
-                    break;
+        System.out.println("Please state the purpose of this run: ");
+        String purpose = scan.nextLine();
+        System.out.println("Please state the filename of this run: ");
+        String filename = scan.nextLine();
+        System.out.println("Please input shelf size of size 50 or greater: ");
+        int chosenShelfSize = scan.nextInt();
+        if(chosenShelfSize < 50){
+            System.out.println("Please restart the program and give a valid input for shelfSize");
+            scan.close();
+            System.exit(0);
+        }
+        scan.nextLine();
+        System.out.println("Please input number of shelves (at least 1): ");
+        int chosenNumOfShelves = scan.nextInt();
+        if(chosenNumOfShelves < 1){
+            System.out.println("Please restart the program and give a valid input for number of shelves");
+            scan.close();
+            System.exit(0);
+        }
+        scan.nextLine();
+        System.out.println("Please input number of carts: ");
+        int chosenNumberOfCarts = scan.nextInt();
+        if(chosenNumberOfCarts == 0){
+            System.out.println("Please restart the program and give a valid input for number of carts");
+            scan.close();
+            System.exit(0);
+        }
+        scan.nextLine();
+        System.out.println("Please input cart size (Cart size must be at least 10 and the product of cart size and number of carts must not be equal to half of number of shelves times shelf size): ");
+        int chosenCartSize = scan.nextInt();
+        //Prevents overfilling
+        if(chosenCartSize < 10 || ((chosenCartSize * chosenNumberOfCarts) + (chosenShelfSize * chosenNumOfShelves / 2) >= (chosenNumOfShelves * chosenShelfSize))){
+            System.out.println("Please restart the program and give a valid input for cartSize");
+            scan.close();
+            System.exit(0);
+        }
+        scan.nextLine();
+        System.out.println("Shelf size: " + chosenShelfSize);
+        System.out.println("Number of shelves: " + chosenNumOfShelves);
+        System.out.println("Number of carts: " + chosenNumberOfCarts);
+        System.out.println("Cart size: " + chosenCartSize);
+        //Starting checking duration here to prevent userInput from messing up timestamps
+        long runTime = System.currentTimeMillis();
+        Library controlLibrary = new Library(chosenShelfSize, chosenNumOfShelves, chosenNumberOfCarts, chosenCartSize);
+        Library FIFSLibrary = new Library(controlLibrary);
+        Library insertionBinaryInsertionLibrary = new Library(controlLibrary);
+        Library insertionSequentialShelvingLibrary = new Library(controlLibrary);
+        Library insertionLibrarySortLibrary = new Library(controlLibrary);
+        Library insertionACOLibrary = new Library(controlLibrary);
+        Library mergeBinaryInsertionLibrary = new Library(controlLibrary);
+        Library mergeSequentialShelvingLibrary = new Library(controlLibrary);
+        Library mergeLibrarySortLibrary = new Library(controlLibrary);
+        Library mergeACOLibrary = new Library(controlLibrary);
+        ShelvingAlgorithm ACO = new ACO();
+        ShelvingAlgorithm FIFS = new FIFS();
+        ShelvingAlgorithm BinaryInsertionSort = new BinaryInsertionSort();
+        ShelvingAlgorithm librarySort = new LibrarySort();
+        ShelvingAlgorithm SequentialShelving = new SequentialShelving();
+        SortingAlgorithm mergeSort = new MergeSort();
+        SortingAlgorithm insertionSort = new InsertionSort();
+        //FIFS does not sort so sorting time will be set to 0
+        FIFSLibrary.LibraryMetrics.setSortingTime(0);
+        FIFS.generateShelvingSequence(FIFSLibrary.carts, FIFSLibrary.FIFOShelves, FIFSLibrary);
+        FIFSLibrary.LibraryMetrics.setShelfUsage(FIFSLibrary.getOverallUtilizationPercentage(FIFSLibrary.FIFOShelves));
+        //Sorting and shelving utilizing insertion sort for carts and Binary Insertion for the shelves
+        insertionSort.sortingSequence(insertionBinaryInsertionLibrary);
+        BinaryInsertionSort.generateShelvingSequence(insertionBinaryInsertionLibrary.carts, insertionBinaryInsertionLibrary.sortedShelves, insertionBinaryInsertionLibrary);
+        insertionBinaryInsertionLibrary.LibraryMetrics.setShelfUsage(insertionBinaryInsertionLibrary.getOverallUtilizationPercentage(insertionBinaryInsertionLibrary.sortedShelves));
+        insertionBinaryInsertionLibrary.LibraryMetrics.setNumOfMisplacedBooks(insertionBinaryInsertionLibrary.findMisplacedBooks(true));
+        System.out.println("Done with Binary");
+        //Sorting and shelving utilizing insertion sort for carts and Sequential Shelving for the shelves
+        insertionSort.sortingSequence(insertionSequentialShelvingLibrary);
+        SequentialShelving.generateShelvingSequence(insertionSequentialShelvingLibrary.carts, insertionSequentialShelvingLibrary.sortedShelves, insertionSequentialShelvingLibrary);
+        insertionSequentialShelvingLibrary.LibraryMetrics.setShelfUsage(insertionSequentialShelvingLibrary.getOverallUtilizationPercentage(insertionSequentialShelvingLibrary.sortedShelves));
+        insertionSequentialShelvingLibrary.LibraryMetrics.setNumOfMisplacedBooks(insertionSequentialShelvingLibrary.findMisplacedBooks(true));
+        //Sorting and shelving utilizing insertion sort for carts and Library Sort for the shelves
+        insertionSort.sortingSequence(insertionLibrarySortLibrary);
+        librarySort.generateShelvingSequence(insertionLibrarySortLibrary.carts, insertionLibrarySortLibrary.librarySortedShelves, insertionLibrarySortLibrary);
+        insertionLibrarySortLibrary.LibraryMetrics.setShelfUsage(insertionLibrarySortLibrary.getOverallUtilizationPercentage(insertionLibrarySortLibrary.librarySortedShelves));
+        //MisplacedBooks is slightly more complicated with library sort (needs to check bigger shelfs but can still be misplaced depending on -2 -1 +1 and +2 books
+        insertionLibrarySortLibrary.LibraryMetrics.setNumOfMisplacedBooks(insertionLibrarySortLibrary.findMisplacedBooks(false));
+        //Sorting and shelving utilizing insertion sort for carts and ACO for the shelves
+        insertionSort.sortingSequence(insertionACOLibrary);
+        ACO.generateShelvingSequence(insertionACOLibrary.carts, insertionACOLibrary.sortedShelves, insertionACOLibrary);
+        insertionACOLibrary.LibraryMetrics.setShelfUsage(insertionACOLibrary.getOverallUtilizationPercentage(insertionACOLibrary.sortedShelves));
+        insertionACOLibrary.LibraryMetrics.setNumOfMisplacedBooks(insertionACOLibrary.findMisplacedBooks(true));
+        System.out.println("Done with Binary");
+        //Sorting and shelving utilizing merge sort for carts and Binary Insertion for the shelves
+        mergeSort.sortingSequence(mergeBinaryInsertionLibrary);
+        System.out.println("Done with Binary");
+        BinaryInsertionSort.generateShelvingSequence(mergeBinaryInsertionLibrary.carts, mergeBinaryInsertionLibrary.sortedShelves, mergeBinaryInsertionLibrary);
+        System.out.println("Done with Binary");
+        mergeBinaryInsertionLibrary.LibraryMetrics.setShelfUsage(mergeBinaryInsertionLibrary.getOverallUtilizationPercentage(mergeBinaryInsertionLibrary.sortedShelves));
+        System.out.println("Done with Binary");
+        mergeBinaryInsertionLibrary.LibraryMetrics.setNumOfMisplacedBooks(mergeBinaryInsertionLibrary.findMisplacedBooks(true));
+        System.out.println("Done with Binary");
+        //Sorting and shelving utilizing merge sort for carts and Sequential Shelving for the shelves
+        mergeSort.sortingSequence(mergeSequentialShelvingLibrary);
+        SequentialShelving.generateShelvingSequence(mergeSequentialShelvingLibrary.carts, mergeSequentialShelvingLibrary.sortedShelves, mergeSequentialShelvingLibrary);
+        mergeSequentialShelvingLibrary.LibraryMetrics.setShelfUsage(mergeSequentialShelvingLibrary.getOverallUtilizationPercentage(mergeSequentialShelvingLibrary.sortedShelves));
+        mergeSequentialShelvingLibrary.LibraryMetrics.setNumOfMisplacedBooks(mergeSequentialShelvingLibrary.findMisplacedBooks(true));
+        System.out.println("Done with Binary");
+        //Sorting and shelving utilizing merge sort for carts and Library Sort for the shelves
+        mergeSort.sortingSequence(mergeLibrarySortLibrary);
+        librarySort.generateShelvingSequence(mergeLibrarySortLibrary.carts, mergeLibrarySortLibrary.librarySortedShelves, mergeLibrarySortLibrary);
+        mergeLibrarySortLibrary.LibraryMetrics.setShelfUsage(mergeLibrarySortLibrary.getOverallUtilizationPercentage(mergeLibrarySortLibrary.librarySortedShelves));
+        mergeLibrarySortLibrary.LibraryMetrics.setNumOfMisplacedBooks(mergeLibrarySortLibrary.findMisplacedBooks(false));
+        System.out.println("Done with Binary");
+        //Sorting and shelving utilizing merge sort for carts and ACO for the shelves
+        mergeSort.sortingSequence(mergeACOLibrary);
+        ACO.generateShelvingSequence(mergeACOLibrary.carts, mergeACOLibrary.sortedShelves, mergeACOLibrary);
+        mergeACOLibrary.LibraryMetrics.setShelfUsage(mergeACOLibrary.getOverallUtilizationPercentage(mergeACOLibrary.sortedShelves));
+        mergeACOLibrary.LibraryMetrics.setNumOfMisplacedBooks(mergeACOLibrary.findMisplacedBooks(true));
+        List<Library> libraries = Arrays.asList(controlLibrary, FIFSLibrary, insertionBinaryInsertionLibrary, insertionSequentialShelvingLibrary, insertionLibrarySortLibrary, insertionACOLibrary, mergeBinaryInsertionLibrary, mergeSequentialShelvingLibrary, mergeLibrarySortLibrary, mergeACOLibrary);
+        List<String> libraryNames = Arrays.asList("controlLibrary", "FIFSLibrary", "insertionBinaryInsertionLibrary", "insertionSequentialShelvingLibrary", "insertionLibrarySortLibrary", "insertionACOLibrary", "mergeBinaryInsertionLibrary", "mergeSequentialShelvingLibrary", "mergeLibrarySortLibrary", "mergeACOLibrary");
+        exportRunSummary(libraries, libraryNames, chosenShelfSize, chosenNumOfShelves, chosenNumberOfCarts, purpose, filename, runTime, chosenCartSize);
+    }
+    public static void exportRunSummary(List<Library> libraries, List<String> libraryNames, int shelfSize, int numOfShelves, int numOfCarts, String purpose, String fileName, long runTime, int cartSize) {
+        long totalRunTime = System.currentTimeMillis() - runTime;
+        try (PrintWriter writer = new PrintWriter(fileName)) {
+            //Showing the metadata before the results of the run
+            writer.println("Purpose of Run: " + purpose);
+            writer.println("Total Run Time: " + totalRunTime + "ms");
+            writer.println("Shelf Size: " + shelfSize);
+            writer.println("Number of Shelves: " + numOfShelves);
+            writer.println("Number of Carts: " + numOfCarts);
+            writer.println("Cart Size: " + cartSize + "\n");
+            //Column Headers
+            writer.printf("%-34s %14s %14s %11s %26s %20s%n", "LibraryName","SortingTimeMs","ShelvingTimeMs","ShelfUsage%","TotalDistanceTraveled(Meters)","NumOfMisplacedBooks");
+            //Printing the metrics of each Library
+            for (int i = 0; i < libraries.size(); i++) {
+                Library lib = libraries.get(i);
+                String libraryName = libraryNames.get(i);
+                //Formatting so numbers are in line
+                writer.printf("%-34s %14d %14d %10.2f %26d %20d%n", libraryName, lib.LibraryMetrics.getSortingTime(), lib.LibraryMetrics.getShelvingTime(), lib.LibraryMetrics.getShelfUsage(), lib.LibraryMetrics.getTotalDistanceTraveled(), lib.LibraryMetrics.getNumOfMisplacedBooks());
             }
+            System.out.println("Export complete! File saved as: " + fileName);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error exporting file.");
+            e.printStackTrace();
         }
     }
 }

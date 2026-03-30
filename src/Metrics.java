@@ -1,3 +1,6 @@
+import java.io.*;
+import java.time.*;
+import java.time.format.*;
 import java.util.*;
 public class Metrics {
     private int totalDistanceTraveled;
@@ -5,8 +8,8 @@ public class Metrics {
     //Changed variable name from m1 to make it more clear that this is tracking the number of misplaced books (might change to be based on % instead of #)
     private int numOfMisplacedBooks;
 
-    private int sortingTime;
-    private int shelvingTime;
+    private long sortingTime;
+    private long shelvingTime;
 
 
     public void updateDistance(int currentLocation, int destination){
@@ -28,7 +31,28 @@ public class Metrics {
     public double getShelfUsage() {
         return shelfUsage;
     }
-    public void printResults(Library L){
-        System.out.println("Total Distance Traveled: " + getTotalDistanceTraveled() + " Meters\n Shelf Usage: " + getShelfUsage() + "%");
+
+    public void setSortingTime(long i) {
+        sortingTime = i;
+    }
+
+    public void setShelvingTime(long i) {
+        shelvingTime = i;
+    }
+
+    public long getSortingTime() {
+        return sortingTime;
+    }
+
+    public long getShelvingTime() {
+        return shelvingTime;
+    }
+
+    public int getNumOfMisplacedBooks() {
+        return numOfMisplacedBooks;
+    }
+    public void setNumOfMisplacedBooks(int m) {
+        numOfMisplacedBooks = m;
     }
 }
+
