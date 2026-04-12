@@ -27,36 +27,51 @@ public class Shelf {
         this.Books = new Book[shelfSize];
     }
 
+    //Copy constructor
+    public Shelf(Shelf other) {
+        this.shelfSize = other.shelfSize;
+        this.id = other.id;
+        this.startingRange = other.startingRange;
+        this.endRange = other.endRange;
+        this.Books = new Book[other.Books.length];
+        for (int i = 0; i < other.Books.length; i++) {
+            this.Books[i] = other.Books[i];
+        }
+    }
 
     //Might want to change method of sorting to Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle
     //Method to insert a book into the shelf
-    public void insertBook(Book b){
-        for (int i = 0; i<Books.length-1; i++){
-            //Needs a handler for overflow and title as well as moving the books to the right of the insertion
-            if (Books[i+1] == null){
-                Books[i+1] = b;
-                return;
-            }
-            if (Books[i].getAuthor().compareTo(b.getAuthor()) < 0 && (b.getAuthor().compareTo(Books[i+1].getAuthor()) > 0)){
-                //Book that is currently being held to put on the shelf (physically speaking)
-                Book heldBook = b;
-                //Next book on the shelf which needs to be stored to prevent it from being overwritten
-                Book nextBook;
-                for(int j = i; j < Books.length; j++){
-                    //Only shifts book to the right when there is a book to move
-                    if(Books[j] != null){
-                        nextBook = Books[j];
-                        Books[j] = heldBook;
-                        heldBook = nextBook;
-                    }
-                }
-                return;
-            }
+    public void insertBook(Book b) {
+        if (b == null) return;
+        Comparator<Book> comp = Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle);
+        //Find insertion index
+        int insertIndex = 0;
+        while (insertIndex < Books.length &&
+                Books[insertIndex] != null &&
+                comp.compare(Books[insertIndex], b) < 0) {
+            insertIndex++;
         }
+        //If shelf is full do nothing (or handle overflow)
+        if (insertIndex >= Books.length) return;
+        //Shift right to make space
+        for (int i = Books.length - 1; i > insertIndex; i--) {
+            Books[i] = Books[i - 1];
+        }
+        //Insert book
+        Books[insertIndex] = b;
     }
 
     //Method to remove and return a book from the shelf given an index
     public Book removeBook(int b){
+        Book removedBook = Books[b];
+        for (int i = b; i < Books.length - 1; i++) {
+            Books[i] = Books[i + 1];
+        }
+        Books[Books.length - 1] = null;
+        return removedBook;
+    }
+
+    public Book removeLibrarySortBook(int b){
         Book removedBook = Books[b];
         Books[b] = null;
         return removedBook;

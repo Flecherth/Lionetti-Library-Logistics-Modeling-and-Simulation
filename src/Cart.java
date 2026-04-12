@@ -19,6 +19,14 @@ public class Cart {
         }
     }
 
+    //Copy constructor
+    public Cart(Cart other) {
+        this.books = new Book[other.books.length];
+        for (int i = 0; i < other.books.length; i++) {
+            this.books[i] = other.books[i];
+        }
+    }
+
     //Adds the book to the cart in the first available position
     public void addBook(Book b){
         for (int i = 0; i < books.length; i++){

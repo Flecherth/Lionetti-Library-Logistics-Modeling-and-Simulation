@@ -12,7 +12,7 @@ public class InsertionSort implements SortingAlgorithm {
                     continue;
                 }
                 int comparedIndex = i - 1;
-                while (comparedIndex >= 0 && Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle).compare(key, cart.books[comparedIndex]) > 0){
+                while (comparedIndex >= 0 && cart.books[comparedIndex] != null && Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle).compare(cart.books[comparedIndex], key) > 0){
                     cart.books[comparedIndex + 1] = cart.books[comparedIndex];
                     comparedIndex--;
                 }

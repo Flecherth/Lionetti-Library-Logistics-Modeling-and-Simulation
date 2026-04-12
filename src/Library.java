@@ -17,15 +17,31 @@ public class Library {
 
     //Copy constructor for running the simulation with the same books that are originally generated
     Library (Library masterLibrary){
-        this.sortedShelves = masterLibrary.sortedShelves;
-        this.FIFOShelves = masterLibrary.FIFOShelves;
-        this.librarySortedShelves = masterLibrary.librarySortedShelves;
-        this.books = masterLibrary.books;
-        this.carts = masterLibrary.carts;
+        this.books = new ArrayList<>();
+        for (Book b : masterLibrary.books) {
+            this.books.add(new Book(b)); // requires Book copy constructor
+        }
+        this.sortedShelves = new ArrayList<>();
+        for (Shelf s : masterLibrary.sortedShelves) {
+            this.sortedShelves.add(new Shelf(s)); // requires Shelf copy constructor
+        }
+        this.FIFOShelves = new ArrayList<>();
+        for (Shelf s : masterLibrary.FIFOShelves) {
+            this.FIFOShelves.add(new Shelf(s));
+        }
+        this.librarySortedShelves = new ArrayList<>();
+        for (Shelf s : masterLibrary.librarySortedShelves) {
+            this.librarySortedShelves.add(new Shelf(s));
+        }
+        this.carts = new Cart[masterLibrary.carts.length];
+        for (int i = 0; i < masterLibrary.carts.length; i++) {
+            this.carts[i] = new Cart(masterLibrary.carts[i]); // requires Cart copy constructor
+        }
         this.numOfShelves = masterLibrary.numOfShelves;
         this.currentFIFOShelf = masterLibrary.currentFIFOShelf;
         this.booksOnShelf = masterLibrary.booksOnShelf;
         this.LibraryMetrics = new Metrics();
+        this.misplacedBooks = new Book[5000];
     }
     Library(int booksPerShelf, int inputtedNumOfShelves, int inputtedNumOfCarts, int cartSize) {
         //Creates an array list of books
@@ -100,8 +116,12 @@ public class Library {
                 currentID++;
             }
             //Shifts shelves if an overflow would happen
-            if (sortedBooksOnShelf >= sortedShelves.get(0).shelfSize){
-                shiftShelves(sortedShelves.get(currentID + 1), book);
+            if (sortedBooksOnShelf >= sortedShelves.get(currentID).Books.length) {
+                //Try to push to next shelf
+                if (currentID + 1 < sortedShelves.size()) {
+                    shiftShelves(sortedShelves.get(currentID + 1), book);
+                }
+                continue;
             }
             //Adds the book to the sorted shelf
             sortedShelves.get(currentID).Books[sortedBooksOnShelf] = book;
@@ -163,6 +183,7 @@ public class Library {
 
     //Runs through the library checking for misplaced books and returns the # of misplaced books (needs to work for librarySorted shelves)
     public int findMisplacedBooks(boolean route) {
+        long startTime = System.currentTimeMillis();
         int numOfMisplacedBooks = 0;
         //If true checks normal sorted shelves otherwise checks librarySortedShelves (no handler for FIFS as there are no misplaced books and the routes are necessary as librarySortedShelves have more books)
         if (route) {
@@ -172,6 +193,7 @@ public class Library {
                         if (shelf.Books[j].isMisplaced(shelf.Books, j, route)) {
                             misplacedBooks[numOfMisplacedBooks] = shelf.removeBook(j);
                             numOfMisplacedBooks++;
+                            j--;
                         }
                     }
                 }
@@ -180,14 +202,16 @@ public class Library {
             for (Shelf shelf : librarySortedShelves) {
                 for (int j = 0; j < shelf.Books.length; j++) {
                     if (shelf.Books[j] != null) {
-                        if (shelf.Books[j].isMisplaced(shelf.Books, j, true)) {
-                            misplacedBooks[numOfMisplacedBooks] = shelf.removeBook(j);
+                        if (shelf.Books[j].isMisplaced(shelf.Books, j, route)) {
+                            misplacedBooks[numOfMisplacedBooks] = shelf.removeLibrarySortBook(j);
                             numOfMisplacedBooks++;
+                            j--;
                         }
                     }
                 }
             }
         }
+        LibraryMetrics.setMisplacedBooksRuntime(System.currentTimeMillis() - startTime);
         return numOfMisplacedBooks;
     }
 }

@@ -12,6 +12,12 @@ public class Book {
     //Sets author to a random 3 letter combination
     this.author = "" + alphabet.charAt(r.nextInt(26)) + alphabet.charAt(r.nextInt(26)) + alphabet.charAt(r.nextInt(26));
     }
+    //Copy constructor
+    public Book(Book other) {
+        this.author = other.author;
+        this.title = other.title;
+        // copy all fields
+    }
 
     public String getTitle(){
         return title;
@@ -24,16 +30,35 @@ public class Book {
 
     //Checks prior and next book on the shelf to see if the book is misplaced
     boolean isMisplaced(Book[] books, int i, boolean route){
+        Comparator<Book> comp = Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle);
+        Book current = books[i];
+        if (current == null) {
+            return false;
+        }
         if (route) {
-            if(i != 0 && i < books.length-1){
-                if (books[i-1] != null && books[i] != null && books[i+1] != null) {
-                    return books[i - 1].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 1].getAuthor()) >= 0);
+            //Check left neighbor
+            if (i > 0 && books[i - 1] != null) {
+                if (comp.compare(books[i - 1], current) > 0) {
+                    return true;
+                }
+            }
+            //Check right neighbor
+            if (i < books.length - 1 && books[i + 1] != null) {
+                if (comp.compare(current, books[i + 1]) > 0) {
+                    return true;
                 }
             }
         } else {
-            if((i > 1) && i < books.length - 2) {
-                if (books[i-1] != null && books[i] != null && books[i+1] != null) {
-                    return books[i - 2].getAuthor().compareTo(books[i].getAuthor()) >= 0 || (books[i].getAuthor().compareTo(books[i + 2].getAuthor()) <= 0);
+            //Check left (2-step)
+            if (i > 1 && books[i - 2] != null) {
+                if (comp.compare(books[i - 2], current) > 0) {
+                    return true;
+                }
+            }
+            //Check right (2-step)
+            if (i < books.length - 2 && books[i + 2] != null) {
+                if (comp.compare(current, books[i + 2]) > 0) {
+                    return true;
                 }
             }
         }

@@ -7,6 +7,7 @@ public class Metrics {
     private double shelfUsage;
     //Changed variable name from m1 to make it more clear that this is tracking the number of misplaced books (might change to be based on % instead of #)
     private int numOfMisplacedBooks;
+    private long misplacedBooksRuntime;
 
     private long sortingTime;
     private long shelvingTime;
@@ -38,6 +39,12 @@ public class Metrics {
 
     public void setShelvingTime(long i) {
         shelvingTime = i;
+    }
+    public void setMisplacedBooksRuntime(long i) {
+        misplacedBooksRuntime = i;
+    }
+    public long getMisplacedBooksRuntime() {
+        return misplacedBooksRuntime;
     }
 
     public long getSortingTime() {

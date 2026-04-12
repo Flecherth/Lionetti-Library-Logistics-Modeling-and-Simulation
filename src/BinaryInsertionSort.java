@@ -5,38 +5,39 @@ public class BinaryInsertionSort implements ShelvingAlgorithm {
     @Override
     public List<Shelf> generateShelvingSequence(Cart[] carts, List<Shelf> s, Library L) {
         long shelvingStartTime = System.currentTimeMillis();
+        Comparator<Book> comp = Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle);
         for (Cart cart : carts) {
-            //For every book in the cart
             for (Book book : cart.books) {
-                if (book == null){
-                    continue;
-                }
+                if (book == null) continue;
+                int destination = Book.setDestination(book, s.size());
+                L.LibraryMetrics.updateDistance(cart.getCurrentShelf(), destination);
+                cart.setCurrentShelf(destination);
+                Book[] shelfBooks = s.get(destination).Books;
                 int low = 0;
-                int high = s.get(cart.getCurrentShelf()).Books.length-1;
-                //Updating distance for the metrics
-                L.LibraryMetrics.updateDistance(cart.getCurrentShelf(), Book.setDestination(book, s.size()));
-                //Updating currentShelf to keep track of distance
-                cart.setCurrentShelf(Book.setDestination(book, s.size()));
+                int high = shelfBooks.length - 1;
                 while (low <= high) {
-                    //Integer to keep track of the middle of the binary sort
-                    int shelfSplitter = (low + high) / 2;
-                    //Checks if the book should be placed alphabetically before the target
-                    if(s.get(cart.getCurrentShelf()).Books[low] == null || s.get(cart.getCurrentShelf()).Books[high] == null || (s.get(cart.getCurrentShelf()).Books[shelfSplitter]) == null) {
-                        high -= 1;
+                    int mid = (low + high) / 2;
+                    Book midBook = shelfBooks[mid];
+
+                    if (midBook == null) {
+                        high = mid - 1;
                     } else {
-                        //Checks if the book should be placed alphabetically before the target
-                        if (Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle).compare(book, s.get(cart.getCurrentShelf()).Books[shelfSplitter]) < 0) {
-                            high = shelfSplitter - 1;
-                        } else if (Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle).compare(book, s.get(cart.getCurrentShelf()).Books[shelfSplitter]) > 0) {
-                            low = shelfSplitter + 1;
+                        int cmp = comp.compare(book, midBook);
+                        if (cmp < 0) {
+                            high = mid - 1;
                         } else {
-                            low = shelfSplitter;
+                            low = mid + 1;
                         }
                     }
                 }
-                for (int i = s.get(cart.getCurrentShelf()).Books.length - 1; i > low; i--) {
-                    s.get(cart.getCurrentShelf()).Books[i] = s.get(cart.getCurrentShelf()).Books[i - 1];
+                if (low >= shelfBooks.length) {
+                    low = shelfBooks.length - 1;
                 }
+                // shift right
+                for (int i = shelfBooks.length - 1; i > low; i--) {
+                    shelfBooks[i] = shelfBooks[i - 1];
+                }
+                shelfBooks[low] = book;
             }
         }
         L.LibraryMetrics.setShelvingTime(System.currentTimeMillis() - shelvingStartTime);
