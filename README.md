@@ -2,10 +2,7 @@
 My simulation, the "Lionetti Library Logistics" will attempt to simulate the environment of a public library answering the question "What is the most efficient way to sort and shelve books?". The simulation will be simulating using only one age group of books to be selected and only those books will be sorted (otherwise, a YA RIO could be across the entire library in comparison to a J RIO). The shelves will also be a uniform distance from each other. The simulation will not include variables such as book weight, size, or a librarian's knowledge of the layout of the library or the books in its collection. 
 
 Project Status
-Classes Fully Implemented: BinaryInsertionSort, Book, Cart, FIFS, Library, SequentialShelving
-Classes Partially Implemented: Driver, Metrics, LibrarySort
-Classes to be Implemented: ACO
-Many changes are coming to the overall structure of the simulation including the ability to get the results of different algorithms on the same library as well as fully implementing the LibrarySort and ACO algorithms. There were multiple changes to the structure but the most important changes were my decision to not use LibrarySort to sort carts and instead utilize insertion sort and merge sort to sort carts and LibrarySort to place books on to shelves.
+Every method fully implemented and test runs completed
 
 Installation Instructions:
 In your IDE terminal type git clone (https://github.com/Flecherth/Lionetti-Library-Logistics-Modeling-and-Simulation/tree/master) or download files any other way
@@ -14,7 +11,7 @@ Set src as source root
 Run driver
 
 Usage:
-Initiate the driver and generate carts by inputting 1. From there you can either sort the cart using insertion sort (option 3) and shelve utilizing sequential shelving (option 5) or you can shelve without sorting using FIFS (option 4). Once the books from the cart are shelved you can calculate the shelf usage using option 8, print the results with option 9, and end the program with option 10. FIFS sorting should have lower distance traveled in comparison to SequentialShelving but greater %usage as unutilized shelves are not apart of the overall shelf utilization calculations.
+Initiate the driver and input the name of your file as well as the purpose of this run. Then, input values for shelf size, number of shelves, number of carts, and cart size keeping in mind that there must be at least 1 shelf and that a library cannot be overfilled so number of carts and cart size cannot exceed half of the number of shelves times shelf size. The program might take a couple of seconds to run if large numbers were chosen as ACO takes an exponentially long time to run. Expected results should be that FIFS sorting should have faster times than every other library, less total distance traveled, and higher shelf usage, ACO should have the second lowest distance traveled with high shelving times, mergeSort should outperform insertionSort on average, and LibrarySort should have average shelving times with low shelf usage.
 
 Architecture Overview:
 The key entity types in this simulation are Libraries, Individual Books, Cart of Books, and Shelves
