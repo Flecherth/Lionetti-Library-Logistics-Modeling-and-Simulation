@@ -13,6 +13,14 @@ Run driver
 Usage:
 Initiate the driver and input the name of your file as well as the purpose of this run. Then, input values for shelf size, number of shelves, number of carts, and cart size keeping in mind that there must be at least 1 shelf and that a library cannot be overfilled so number of carts and cart size cannot exceed half of the number of shelves times shelf size. The program might take a couple of seconds to run if large numbers were chosen as ACO takes an exponentially long time to run. Expected results should be that FIFS sorting should have faster times than every other library, less total distance traveled, and higher shelf usage, ACO should have the second lowest distance traveled with high shelving times, mergeSort should outperform insertionSort on average, and LibrarySort should have average shelving times with low shelf usage.
 
+Example Inputs:
+Purpose: Control
+Filename: Run_01.csv
+Shelf Size: 100
+Number of Shelves: 10
+Number of Carts: 10
+Cart Size: 10
+
 Architecture Overview:
 The key entity types in this simulation are Libraries, Individual Books, Cart of Books, and Shelves
 • Libraries will contain books, carts of books, and shelves.
@@ -21,3 +29,4 @@ The key entity types in this simulation are Libraries, Individual Books, Cart of
 • Shelves will contain a wide variety of mostly sorted books along with a range for which books
 should be placed on it (these attributes work differently in the first-in first-shelved method)
 A majority of the architectural changes were method additions to classes like Library including fillShelves, shiftShelves, etc... I renamed BinarySort to BinaryInsertionSort to make it more accurate, did not include currentLocation and Destination variables for the book class as they were unnecessary, and had Library utilize the Metrics class instead of the Driver.
+
